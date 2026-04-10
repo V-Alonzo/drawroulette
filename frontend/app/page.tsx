@@ -2,16 +2,29 @@
 
 import { useEffect, useState } from "react";
 import Roulette from "./components/Roulette";
-
+import RegistryModal from "./components/Modal";
 
 export default function Home() {
   
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [rouletteNumbers, setRouletteNumbers] = useState<number[]>([]);
   const [numberSelected, setNumberSelected] = useState<number>(-1);
+  const [showRegistryModal, setShowRegistryModal] = useState(false);
+  const[shouldShowModal, setShouldShowModal] = useState(false);
+  const [spinNumber, setSpinNumber] = useState(0);
 
   const setRouletteResult = (number: number) => {
     setNumberSelected(number);
+    setShouldShowModal(true);
+    setSpinNumber(prev => prev + 1);
+  }
+
+  const performModalClose = (registeredTicket : boolean) => {
+    setShowRegistryModal(false);
+
+    if(registeredTicket){
+      setRouletteNumbers(prevNumbers => prevNumbers.filter(num => num !== numberSelected));
+    }
   }
 
   const getNumbers = async () => {
@@ -33,15 +46,14 @@ export default function Home() {
   }
 
   useEffect(() => {
+    if(numberSelected === -1 || !shouldShowModal) return;
+    
     console.log("Número seleccionado:", numberSelected);
 
-    setRouletteNumbers(prevNumbers => {
-      if(rouletteNumbers.includes(numberSelected)) return prevNumbers.filter(num => num !== numberSelected);
-      return prevNumbers;
-    })
+    setShowRegistryModal(true);
 
-    
-  }, [numberSelected]);
+    setShouldShowModal(false);
+  }, [numberSelected, shouldShowModal]);
 
   useEffect(() => {
     getNumbers();
@@ -51,7 +63,9 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
 
-      <Roulette key={numberSelected} data={rouletteNumbers} setRouletteResult={setRouletteResult} />
+      <Roulette key={spinNumber} data={rouletteNumbers} setRouletteResult={setRouletteResult} />
+
+      {showRegistryModal && <RegistryModal ticketNumber={numberSelected} onClose={performModalClose}/>}
 
     </div>
   );

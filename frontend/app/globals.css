@@ -55,3 +55,62 @@ body {
   font-size: 0.8rem;
   font-weight: bold;
 }
+
+.overlayStyles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalStyles {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bodyModalStyles {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.titleModal {
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+
+}
+
+.buttonModal {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.closeButtonModal {
+  position: relative;
+  top: -40px;
+  left: 415px;
+  padding: 10px 20px;
+  background-color: #e30000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
