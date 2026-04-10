@@ -44,6 +44,8 @@ export default function Home() {
 
       setRegisteredTickets(data.registeredTickets);
 
+      getNumbers();
+
     }
     catch(error){
       console.error("Error fetching data:", error);
