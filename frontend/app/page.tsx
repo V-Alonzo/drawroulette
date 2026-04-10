@@ -23,9 +23,9 @@ export default function Home() {
         },
       }
 
-      const response = await fetch(`${API_URL}/getTicketsInterval`, request);
+      const response = await fetch(`${API_URL}/getFreeNumbers`, request);
       const data = await response.json();
-      setRouletteNumbers(Array.from({ length: Number(data.max) - Number(data.min) + 1 }, (_, i) => i + Number(data.min)));
+      setRouletteNumbers(data.availableNumbers);
 
     } catch (error) {
       console.error("Error fetching data:", error);

@@ -25,10 +25,14 @@ app.get('/api/data', (req, res) => {
   res.json({ message: "Hello from Express backend!" });
 });
 
-app.get("/api/getTicketsInterval", (req, res) => {
+app.get("/api/getFreeNumbers", (req, res) => {
   const min = process.env.MINIMUM_NUMBER_TICKETS;
   const max = process.env.MAXIMUM_NUMBER_TICKETS;
-  return res.json({ min, max });
+
+  const originalNumbersArray = Array.from({ length: max - min + 1 }, (_, i) => i + parseInt(min));
+  const availableNumbers = originalNumbersArray.filter(num => !registeredNumbers.includes(num));
+
+  return res.json({ availableNumbers });
 });
 
 app.get("/api/getRegisteredNumbers", (req, res) => {
