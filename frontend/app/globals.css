@@ -75,6 +75,7 @@ body {
     border-radius: 8px;
     max-width: 500px;
     width: 90%;
+    
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -103,10 +104,9 @@ body {
 }
 
 .closeButtonModal {
-  position: relative;
-  top: -40px;
-  left: 415px;
   padding: 10px 20px;
+  margin-bottom: 20px;
+  margin-top: 20px;
   background-color: #e30000;
   color: white;
   border: none;

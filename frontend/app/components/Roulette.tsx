@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-const WHEEL_SIZE = 600;
+const WHEEL_SIZE = 300;
 const SPIN_DURATION_SECONDS = 4;
 const COLORS = [
   "#3f297e",
