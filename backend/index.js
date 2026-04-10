@@ -50,9 +50,12 @@ const establishFirebaseListener = () => {
         registeredTickets = {}
         registeredNumbers = []
 
-        for (const [index, value] of data.entries()) {
-            registeredTickets[index] = value;
-            registeredNumbers.push(index);
+        console.log("Datos actualizados desde Firebase:", Object.keys(data));
+
+        for (const key of Object.keys(data)) {
+            const value = data[key];
+            registeredTickets[key] = value;
+            registeredNumbers.push(parseInt(key, 10));
         }
 
       },
