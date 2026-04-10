@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-const WHEEL_SIZE = 300;
+const WHEEL_SIZE = 200;
 const SPIN_DURATION_SECONDS = 4;
 const COLORS = [
   "#3f297e",
@@ -120,7 +120,7 @@ const Roulette = ({ data, setRouletteResult }: { data: number[], setRouletteResu
 
   return (
     <>
-      <div className="roulette-container">
+      <div className="">
         {rouletteData.length > 0 ? (
           <div
             style={{
@@ -212,23 +212,17 @@ const Roulette = ({ data, setRouletteResult }: { data: number[], setRouletteResu
 
         {rouletteData.length > 0 && (
             <button
-          className="button roulette-button"
+          className="buttonModal"
           onClick={handleSpinClick}
           disabled={mustSpin || rouletteData.length === 0}
             >
             ¡Gira la Ruleta!
             </button>
         )}
-        
 
       </div>
       <br />
-      <button
-        className="prize-message"
-        onClick={handleSpinClick}
-        disabled={mustSpin || rouletteData.length === 0}
-      >
-      </button>
+
     </>
   );
 };

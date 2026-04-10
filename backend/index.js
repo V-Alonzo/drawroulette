@@ -41,6 +41,11 @@ app.get("/api/getRegisteredNumbers", (req, res) => {
   return res.json({ registeredNumbers });
 });
 
+app.get("/api/getRegisteredTickets", (req, res) => {
+  return res.json({ registeredTickets });
+});
+
+
 app.get("/api/getNumber", (req, res) => {
     const min = process.env.MINIMUM_NUMBER_TICKETS;
     const max = process.env.MAXIMUM_NUMBER_TICKETS;
