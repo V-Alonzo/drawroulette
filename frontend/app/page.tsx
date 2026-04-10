@@ -11,7 +11,7 @@ export default function Home() {
   
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [rouletteNumbers, setRouletteNumbers] = useState<number[]>([]);
-  const [numberSelected, setNumberSelected] = useState<number>(-1);
+  const [numberSelected, setNumberSelected] = useState<number>(0);
   const [showRegistryModal, setShowRegistryModal] = useState(false);
   const[shouldShowModal, setShouldShowModal] = useState(false);
   const [spinNumber, setSpinNumber] = useState(0);
@@ -24,8 +24,8 @@ export default function Home() {
   }
 
   const isIntegerNumber = (value: string) => {
-    const parsed = Number.parseInt(value, 10);
-    return !isNaN(parsed) && parsed >= 0;
+    const regex = /^\d+$/;
+    return regex.test(value);
   }
 
   const performModalClose = (registeredTicket : boolean) => {
@@ -78,7 +78,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if(numberSelected === -1 || !shouldShowModal) return;
+    if(numberSelected == 0 || !shouldShowModal) return;
     
     console.log("Número seleccionado:", numberSelected);
 
@@ -104,7 +104,11 @@ export default function Home() {
         }
         />}  
 
-      <Input className="p-8" hint = {!isIntegerNumber(numberSelected.toString()) ? "El número es inválido" : ""} isInvalid={!isIntegerNumber(numberSelected.toString())} label="Número de Boleto" value={numberSelected.toString() === "-1"?"0":numberSelected.toString() || "0"} onChange={(e) => setNumberSelected(Number(e))}/>
+      <Input className="p-8" hint = {!isIntegerNumber(numberSelected.toString()) ? "El número es inválido" : ""} isInvalid={!isIntegerNumber(numberSelected.toString())} label="Número de Boleto" value={numberSelected.toString()} onChange={(e) => {
+        if(isIntegerNumber(e))setNumberSelected(Number(e));
+        if(e === "") setNumberSelected(0);
+
+      }}/>
 
       <button className="buttonModal" onClick={() => setShowRegistryModal(true)}>Registrar Boleto Manualmente</button>
 
