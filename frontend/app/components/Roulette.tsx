@@ -210,13 +210,16 @@ const Roulette = ({ data, setRouletteResult }: { data: number[], setRouletteResu
           <p className="no-data-message">No hay boletos que mostrar.</p>
         )}
 
-        <button
+        {rouletteData.length > 0 && (
+            <button
           className="button roulette-button"
           onClick={handleSpinClick}
           disabled={mustSpin || rouletteData.length === 0}
-        >
-          ¡Gira la Ruleta!
-        </button>
+            >
+            ¡Gira la Ruleta!
+            </button>
+        )}
+        
 
       </div>
       <br />
