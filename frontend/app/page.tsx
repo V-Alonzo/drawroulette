@@ -5,6 +5,7 @@ import Roulette from "./components/Roulette";
 import RegistryModal from "./components/Modal";
 import RegistryForm from "./components/RegistryForm";
 import TicketsTable from "./components/TicketsTable";
+import { Input } from "./components/InputFields/base/input/input";
 
 export default function Home() {
   
@@ -20,6 +21,11 @@ export default function Home() {
     setNumberSelected(number);
     setShouldShowModal(true);
     setSpinNumber(prev => prev + 1);
+  }
+
+  const isIntegerNumber = (value: string) => {
+    const parsed = Number.parseInt(value, 10);
+    return !isNaN(parsed) && parsed >= 0;
   }
 
   const performModalClose = (registeredTicket : boolean) => {
@@ -97,6 +103,10 @@ export default function Home() {
         <RegistryForm ticketNumber={numberSelected} closeModal={performModalClose}/>        
         }
         />}  
+
+      <Input className="p-8" hint = {!isIntegerNumber(numberSelected.toString()) ? "El número es inválido" : ""} isInvalid={!isIntegerNumber(numberSelected.toString())} label="Número de Boleto" value={numberSelected.toString() === "-1"?"0":numberSelected.toString() || "0"} onChange={(e) => setNumberSelected(Number(e))}/>
+
+      <button className="buttonModal" onClick={() => setShowRegistryModal(true)}>Registrar Boleto Manualmente</button>
 
       <button className="buttonModal" onClick={checkRegisteredTickets}>Actualizar Registros</button>
 
