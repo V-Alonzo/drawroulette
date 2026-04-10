@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-const WHEEL_SIZE = 320;
+const WHEEL_SIZE = 600;
 const SPIN_DURATION_SECONDS = 4;
 const COLORS = [
   "#3f297e",
@@ -21,7 +21,17 @@ const COLORS = [
 
 const normalizeAngle = (angle: number) => ((angle % 360) + 360) % 360;
 
-const Roulette = ({ data }: { data: number[] }) => {
+const Roulette = ({ data, setRouletteResult }: { data: number[], setRouletteResult: (number: number) => void}) => {
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+    const request = {
+            method: "GET",
+            headers: {
+            "Content-Type": "application/json",
+            },
+        }
+
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [rotation, setRotation] = useState(0);
@@ -51,11 +61,31 @@ const Roulette = ({ data }: { data: number[] }) => {
     return `conic-gradient(from 0deg, ${segments.join(", ")})`;
   }, [rouletteData]);
 
+  const getNumberFromBackend = async () => {
+    try {
+        const response = await fetch(`${API_URL}/getNumber`, request);
+        const res = await response.json();
+        console.log("Número obtenido del backend:", res.number);
+        if(Object.keys(res).includes("error")){
+            alert(res.error);
+            return -1;
+        }
+        return res.number;
+    }
+    catch (error) {
+        console.error("Error fetching data:", error);
+        alert("Error al obtener el número del backend. Por favor, inténtalo de nuevo.");
+        return -1;
+    }
+  }
 
-  const handleSpinClick = () => {
+  const handleSpinClick = async () => {
     if (rouletteData.length === 0 || mustSpin) return;
 
-    const newPrizeNumber = Math.floor(Math.random() * rouletteData.length);
+    const res = await getNumberFromBackend();
+    if(res === -1) return;
+
+    const newPrizeNumber = rouletteData.indexOf(res);
     const sliceAngle = 360 / rouletteData.length;
     const selectedSliceCenter = newPrizeNumber * sliceAngle + sliceAngle / 2;
     const targetAngle = normalizeAngle(360 - selectedSliceCenter);
@@ -75,6 +105,7 @@ const Roulette = ({ data }: { data: number[] }) => {
 
     spinTimeoutRef.current = setTimeout(() => {
       setMustSpin(false);
+      setRouletteResult(rouletteData[newPrizeNumber]);
       spinTimeoutRef.current = null;
     }, SPIN_DURATION_SECONDS * 1000);
   };
@@ -194,9 +225,6 @@ const Roulette = ({ data }: { data: number[] }) => {
         onClick={handleSpinClick}
         disabled={mustSpin || rouletteData.length === 0}
       >
-        {!mustSpin
-          ? "Tu número es el: " + String(rouletteData[displayedPrizeIndex] ?? "")
-          : "Girando..."}
       </button>
     </>
   );

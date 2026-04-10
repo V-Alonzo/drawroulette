@@ -1,12 +1,18 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Roulette from "./components/Roulette";
 
 
 export default function Home() {
-
+  
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const [rouletteNumbers, setRouletteNumbers] = useState<number[]>([]);
+  const [numberSelected, setNumberSelected] = useState<number>(-1);
+
+  const setRouletteResult = (number: number) => {
+    setNumberSelected(number);
+  }
 
   const getNumbers = async () => {
     try {
@@ -17,16 +23,25 @@ export default function Home() {
         },
       }
 
-      console.log("Fetching data from backend...");
-      console.log(`${API_URL}/data`)
-
-      const response = await fetch(`${API_URL}/data`, request);
+      const response = await fetch(`${API_URL}/getTicketsInterval`, request);
       const data = await response.json();
-      console.log("Data from backend:", data);
+      setRouletteNumbers(Array.from({ length: Number(data.max) - Number(data.min) + 1 }, (_, i) => i + Number(data.min)));
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
+
+  useEffect(() => {
+    console.log("Número seleccionado:", numberSelected);
+
+    setRouletteNumbers(prevNumbers => {
+      if(rouletteNumbers.includes(numberSelected)) return prevNumbers.filter(num => num !== numberSelected);
+      return prevNumbers;
+    })
+
+    
+  }, [numberSelected]);
 
   useEffect(() => {
     getNumbers();
@@ -35,7 +50,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <Roulette data={[1,2,3,4]} />
+
+      <Roulette key={numberSelected} data={rouletteNumbers} setRouletteResult={setRouletteResult} />
 
     </div>
   );
