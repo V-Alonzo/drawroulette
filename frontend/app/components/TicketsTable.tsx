@@ -18,7 +18,12 @@ export default function TicketsTable({ registeredTickets }: { registeredTickets:
             }
 
             const generalColumns = [info.name, info.email, info.phone];
-            const matchesGeneralSearch = generalColumns.some((value) => value.toLowerCase().includes(normalizedSearch));
+            const matchesGeneralSearch = generalColumns.some((value) =>  
+                {
+                    if(typeof value !== "string") return false;
+                    return value.toLowerCase().includes(normalizedSearch);
+                }
+            );
 
             return matchesTicketNumber && matchesGeneralSearch;
         });
