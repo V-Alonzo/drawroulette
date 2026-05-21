@@ -220,6 +220,8 @@ const Roulette = ({ data, setRouletteResult }: { data: number[], setRouletteResu
             </button>
         )}
 
+        <p className="ml-7 mt-4">{`Boletos restantes: ${rouletteData.length}`}</p>
+
       </div>
       <br />
 
