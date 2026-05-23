@@ -36,6 +36,13 @@ let registeredNumbers = [];
 
 let registeredTickets = {};
 
+const editableTicketFields = {
+  TipoPago: ["Efectivo", "Transferencia", "Ninguno"],
+  Pagado: ["SI", "NO", "DESCONOCIDO"],
+  DeseaFisico: ["SI", "NO", "DESCONOCIDO"],
+  BoletoFisicoEntregado: ["SI", "NO", "NO APLICA", "DESCONOCIDO"],
+};
+
 
 const establishFirebaseListener = () => {
   try {
@@ -102,6 +109,41 @@ app.get("/api/getRegisteredNumbers", (req, res) => {
 
 app.get("/api/getRegisteredTickets", (req, res) => {
   return res.json({ registeredTickets });
+});
+
+app.put("/api/updateTicketField", async (req, res) => {
+  const { ticketNumber, field, value } = req.body;
+  const normalizedTicketNumber = String(ticketNumber ?? "").trim();
+
+  if (!normalizedTicketNumber || !registeredTickets[normalizedTicketNumber]) {
+    return res.status(404).json({ error: "El boleto no existe" });
+  }
+
+  if (!Object.hasOwn(editableTicketFields, field)) {
+    return res.status(400).json({ error: "El campo solicitado no es editable" });
+  }
+
+  if (!editableTicketFields[field].includes(value)) {
+    return res.status(400).json({ error: "El valor solicitado no es válido para este campo" });
+  }
+
+  try {
+    registeredTickets[normalizedTicketNumber] = {
+      ...registeredTickets[normalizedTicketNumber],
+      [field]: value,
+    };
+
+    await sendDataToFirebase(`RegisteredTickets/${normalizedTicketNumber}`, {
+      [field]: value,
+    });
+
+    return res.json({
+      message: "Campo actualizado con éxito",
+      ticket: registeredTickets[normalizedTicketNumber],
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "No se pudo actualizar el boleto en Firebase" });
+  }
 });
 
 

@@ -1,11 +1,12 @@
 "use client"
 
-import { use, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Roulette from "./components/Roulette";
 import RegistryModal from "./components/Modal";
 import RegistryForm from "./components/RegistryForm";
 import TicketsTable from "./components/TicketsTable";
 import { Input } from "./components/InputFields/base/input/input";
+import type { EditableTicketField, EditableTicketValue, RegisteredTickets } from "../types/registered-ticket";
 
 export default function Home() {
   
@@ -15,7 +16,7 @@ export default function Home() {
   const [showRegistryModal, setShowRegistryModal] = useState(false);
   const[shouldShowModal, setShouldShowModal] = useState(false);
   const [spinNumber, setSpinNumber] = useState(0);
-  const [registeredTickets, setRegisteredTickets] = useState<Record<number, { name: string; email: string; phone: string }>>({});
+  const [registeredTickets, setRegisteredTickets] = useState<RegisteredTickets>({});
 
   const setRouletteResult = (number: number) => {
     setNumberSelected(number);
@@ -59,7 +60,44 @@ export default function Home() {
 
   }
 
-  const getNumbers = async () => {
+  const updateTicketField = async (ticketNumber: string, field: EditableTicketField, value: EditableTicketValue) => {
+    const previousValue = registeredTickets[ticketNumber]?.[field];
+
+    setRegisteredTickets((previousTickets) => ({
+      ...previousTickets,
+      [ticketNumber]: {
+        ...previousTickets[ticketNumber],
+        [field]: value,
+      },
+    }));
+
+    try {
+      const response = await fetch(`${API_URL}/updateTicketField`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ticketNumber, field, value }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error ?? "No se pudo actualizar el boleto");
+      }
+    } catch (error) {
+      setRegisteredTickets((previousTickets) => ({
+        ...previousTickets,
+        [ticketNumber]: {
+          ...previousTickets[ticketNumber],
+          [field]: previousValue,
+        },
+      }));
+
+      throw error;
+    }
+  }
+
+  const getNumbers = useCallback(async () => {
     try {
       const request = {
         method: "GET",
@@ -75,7 +113,7 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }
+  }, [API_URL]);
 
   useEffect(() => {
     if(numberSelected == 0 || !shouldShowModal) return;
@@ -90,7 +128,7 @@ export default function Home() {
 
   useEffect(() => {
     getNumbers();
-  }, []);
+  }, [getNumbers]);
 
 
 
@@ -99,10 +137,11 @@ export default function Home() {
 
       <Roulette key={spinNumber} data={rouletteNumbers} setRouletteResult={setRouletteResult} />
 
-      {showRegistryModal && <RegistryModal ticketNumber={numberSelected} onClose={performModalClose} children={
-        <RegistryForm ticketNumber={numberSelected} closeModal={performModalClose}/>        
-        }
-        />}  
+      {showRegistryModal && (
+        <RegistryModal ticketNumber={numberSelected} onClose={performModalClose}>
+          <RegistryForm ticketNumber={numberSelected} closeModal={performModalClose}/>
+        </RegistryModal>
+      )}
 
       <Input className="p-8" hint = {!isIntegerNumber(numberSelected.toString()) ? "El número es inválido" : ""} isInvalid={!isIntegerNumber(numberSelected.toString())} label="Número de Boleto" value={numberSelected.toString()} onChange={(e) => {
         if(isIntegerNumber(e))setNumberSelected(Number(e));
@@ -114,7 +153,7 @@ export default function Home() {
 
       <button className="buttonModal" onClick={checkRegisteredTickets}>Actualizar Registros</button>
 
-      <TicketsTable registeredTickets={registeredTickets}/>
+      <TicketsTable registeredTickets={registeredTickets} onTicketFieldChange={updateTicketField}/>
 
     </div>
   );
